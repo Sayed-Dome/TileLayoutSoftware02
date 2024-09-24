@@ -35,6 +35,30 @@ class GUI:
     def run(self):
         self.window.mainloop()
 
+class TileLayoutGUI:
+    def __init__(self):
+        self.states = []
+        self.current_state = 0
+
+    def add_state(self, state):
+        self.states.append(state)
+        self.current_state += 1
+
+    def undo(self):
+        if self.current_state > 0:
+            self.current_state -= 1
+            return self.states[self.current_state]
+        else:
+            return None
+
+    def redo(self):
+        if self.current_state < len(self.states) - 1:
+            self.current_state += 1
+            return self.states[self.current_state]
+        else:
+            return None
+
+
 if __name__ == "__main__":
     gui = GUI()
     gui.run()

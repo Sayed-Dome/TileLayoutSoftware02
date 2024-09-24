@@ -24,3 +24,16 @@ class Calculator:
                 if polygon.intersects(tile):
                     tile_layout.append(tile)
         return tile_layout
+
+class TileLayout:
+    def __init__(self, gui):
+        self.gui = gui
+        self.tiles = []
+
+    def add_tile(self, tile):
+        self.tiles.append(tile)
+        self.gui.add_state(self.tiles)
+
+    def remove_tile(self, tile):
+        self.tiles.remove(tile)
+        self.gui.add_state(self.tiles)
