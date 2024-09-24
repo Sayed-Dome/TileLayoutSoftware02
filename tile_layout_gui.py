@@ -99,6 +99,13 @@ class TileLayoutGUI:
 
         # Update the display
         pygame.display.flip()
+    def adjust_grid_size(self, new_size):
+        # Update the grid size
+        self.grid_size = new_size
+
+        # Update the grid display
+        self.draw_tiles()
+
 
 def main():
     gui = TileLayoutGUI()
@@ -109,9 +116,18 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.MOUSEWHEEL:
-                gui.pan_grid(event)
-
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if slider.collidepoint(event.pos):
+                    # Update the slider value
+                    slider_value = event.pos[0] - slider.x
+                    # Update the grid size
+                    gui.adjust_grid_size(slider_value)
+            elif event.type == pygame.MOUSEMOTION:
+                if slider.collidepoint(event.pos):
+                    # Update the slider value
+                    slider_value = event.pos[0] - slider.x
+                    # Update the grid size
+                    gui.adjust_grid_size(slider_value)
 
                 # Check if a tile is being clicked in the palette
                 for i, tile in enumerate(tile_palette):
@@ -129,7 +145,16 @@ def main():
                             # Set the dragged tile
                             dragged_tile = (i, j)
                             break
-
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if rotate_button.collidepoint(event.pos):
+                        # Rotate the tile
+                        gui.rotate_tile()
+                    elif flip_button.collidepoint(event.pos):
+                        # Flip the tile
+                        gui.flip_tile()
             elif event.type == pygame.MOUSEBUTTONUP:
                 # Reset the dragged tile
                 dragged_tile = None
@@ -157,8 +182,42 @@ def main():
                     gui.zoom_in()
                 else:
                     gui.zoom_out()
+        # Create buttons to rotate and flip tiles
+        rotate_button = pygame.Rect(10, 50, 100, 20)
+        flip_button = pygame.Rect(10, 80, 100, 20)
 
+        # Draw the buttons
+        pygame.draw.rect(screen, (255, 255, 255), rotate_button)
+        pygame.draw.rect(screen, (255, 255, 255), flip_button)
+
+        # Add labels to the buttons
+        font = pygame.font.Font(None, 24)
+        rotate_label = font.render("Rotate", True, (0, 0, 0))
+        flip_label = font.render("Flip", True, (0, 0, 0))
+
+        # Draw the labels
+        screen.blit(rotate_label, (rotate_button.x + 10, rotate_button.y + 5))
+        screen.blit(flip_label, (flip_button.x + 10, flip_button.y + 5))
+
+        # Update the display
+        pygame.display.flip()
         screen.fill((255, 255, 255))
+        # Create a slider to adjust the grid size
+        slider = pygame.Rect(10, 10, 200, 20)
+        slider_value = 10
+
+        # Draw the slider
+        pygame.draw.rect(screen, (255, 255, 255), slider)
+        pygame.draw.rect(screen, (0, 0, 0), (slider.x, slider.y, slider_value, slider.height))
+
+        # Add a label to the slider
+        font = pygame.font.Font(None, 24)
+        label = font.render("Grid Size: " + str(slider_value), True, (0, 0, 0))
+        screen.blit(label, (slider.x, slider.y - 20))
+
+        # Update the display
+        pygame.display.flip()
+
 
         # Draw the grid
         for i in range(grid_size):
