@@ -41,8 +41,9 @@ class TileLayoutGUI:
         self.current_state = 0
 
     def add_state(self, state):
-        self.states.append(state)
-        self.current_state += 1
+        if state != self.states[-1]:
+            self.states.append(state)
+            self.current_state += 1
 
     def undo(self):
         if self.current_state > 0:

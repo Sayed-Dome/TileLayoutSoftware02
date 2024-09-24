@@ -31,9 +31,11 @@ class TileLayout:
         self.tiles = []
 
     def add_tile(self, tile):
-        self.tiles.append(tile)
-        self.gui.add_state(self.tiles)
+        if tile not in self.tiles:
+            self.tiles.append(tile)
+            self.gui.add_state(self.tiles)
 
     def remove_tile(self, tile):
-        self.tiles.remove(tile)
-        self.gui.add_state(self.tiles)
+        if tile in self.tiles:
+            self.tiles.remove(tile)
+            self.gui.add_state(self.tiles)
