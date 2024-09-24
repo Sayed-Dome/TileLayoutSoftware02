@@ -1,4 +1,5 @@
 import pygame
+import pickle
 
 # Initialize Pygame
 pygame.init()
@@ -36,6 +37,15 @@ tile_palette = [
     {"color": (0, 255, 0), "name": "Green"},
     {"color": (0, 0, 255), "name": "Blue"}
 ]
+
+# Define the save and load functions
+def save_layout(filename):
+    with open(filename, "wb") as f:
+        pickle.dump(grid, f)
+
+def load_layout(filename):
+    with open(filename, "rb") as f:
+        return pickle.load(f)
 
 # Main loop
 while True:
@@ -92,6 +102,16 @@ while True:
 
             # Add the selected tile to the grid
             grid[mouse_y // tile_size][mouse_x // tile_size] = 1
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_s:
+                # Save the layout
+                save_layout("layout.dat")
+                print("Layout saved!")
+            elif event.key == pygame.K_l:
+                # Load the layout
+                grid = load_layout("layout.dat")
+                print("Layout loaded!")
 
     # Draw the grid
     screen.fill((255, 255, 255))
