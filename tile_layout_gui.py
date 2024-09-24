@@ -76,6 +76,29 @@ class TileLayoutGUI:
     def draw_tiles(self, tiles):
         for tile in tiles:
             pygame.draw.rect(screen, tile.color, (tile.x * self.zoom_level, tile.y * self.zoom_level, tile.width * self.zoom_level, tile.height * self.zoom_level))
+    def pan_grid(self, event):
+        # Get the mouse wheel movement
+        wheel_movement = event.wheel
+
+        # Update the grid position based on the mouse wheel movement
+        self.grid_position_x += wheel_movement * self.grid_size
+        self.grid_position_y += wheel_movement * self.grid_size
+
+        # Update the grid display
+        self.draw_tiles()
+
+    def draw_tiles(self):
+        # Clear the screen
+        self.screen.fill((255, 255, 255))
+
+        # Draw the grid
+        for i in range(self.grid_size):
+            for j in range(self.grid_size):
+                # Draw the tile at the current position
+                pygame.draw.rect(self.screen, (0, 0, 0), (self.grid_position_x + i * self.tile_size, self.grid_position_y + j * self.tile_size, self.tile_size, self.tile_size), 1)
+
+        # Update the display
+        pygame.display.flip()
 
 def main():
     gui = TileLayoutGUI()
@@ -86,9 +109,9 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                # Get the mouse position
-                mouse_x, mouse_y = event.pos
+            elif event.type == pygame.MOUSEWHEEL:
+                gui.pan_grid(event)
+
 
                 # Check if a tile is being clicked in the palette
                 for i, tile in enumerate(tile_palette):
