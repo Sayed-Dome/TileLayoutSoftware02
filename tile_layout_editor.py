@@ -24,6 +24,19 @@ tile_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 # Define the tile being dragged
 dragged_tile = None
 
+# Define the selected tile
+selected_tile = None
+
+# Define the snapping threshold
+snapping_threshold = 10
+
+# Define the tile palette
+tile_palette = [
+    {"color": (255, 0, 0), "name": "Red"},
+    {"color": (0, 255, 0), "name": "Green"},
+    {"color": (0, 0, 255), "name": "Blue"}
+]
+
 # Main loop
 while True:
     for event in pygame.event.get():
@@ -34,7 +47,15 @@ while True:
             # Get the mouse position
             mouse_x, mouse_y = event.pos
 
-            # Check if a tile is being clicked
+            # Check if a tile is being clicked in the palette
+            for i, tile in enumerate(tile_palette):
+                if (i * tile_size < mouse_x < (i + 1) * tile_size and
+                        screen_height - tile_size < mouse_y < screen_height):
+                    # Set the selected tile
+                    selected_tile = tile
+                    break
+
+            # Check if a tile is being clicked in the grid
             for i in range(grid_size):
                 for j in range(grid_size):
                     if (i * tile_size < mouse_x < (i + 1) * tile_size and
@@ -42,15 +63,34 @@ while True:
                         # Set the dragged tile
                         dragged_tile = (i, j)
                         break
+
         elif event.type == pygame.MOUSEBUTTONUP:
             # Reset the dragged tile
             dragged_tile = None
+
         elif event.type == pygame.MOUSEMOTION and dragged_tile is not None:
             # Get the mouse position
             mouse_x, mouse_y = event.pos
 
-            # Move the dragged tile to the new position
-            grid[dragged_tile[1]][dragged_tile[0]] = 0
+            # Snap the tile to the grid
+            snapped_x = round(mouse_x / tile_size) * tile_size
+            snapped_y = round(mouse_y / tile_size) * tile_size
+
+            # Check if the snapped position is within the snapping threshold
+            if abs(snapped_x - mouse_x) < snapping_threshold and abs(snapped_y - mouse_y) < snapping_threshold:
+                # Move the dragged tile to the snapped position
+                grid[dragged_tile[1]][dragged_tile[0]] = 0
+                grid[snapped_y // tile_size][snapped_x // tile_size] = 1
+            else:
+                # Move the dragged tile to the new position
+                grid[dragged_tile[1]][dragged_tile[0]] = 0
+                grid[mouse_y // tile_size][mouse_x // tile_size] = 1
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and selected_tile is not None:
+            # Get the mouse position
+            mouse_x, mouse_y = event.pos
+
+            # Add the selected tile to the grid
             grid[mouse_y // tile_size][mouse_x // tile_size] = 1
 
     # Draw the grid
@@ -60,6 +100,11 @@ while True:
             if grid[j][i] == 1:
                 pygame.draw.rect(screen, tile_colors[0], (i * tile_size, j * tile_size, tile_size, tile_size))
             pygame.draw.rect(screen, (0, 0, 0), (i * tile_size, j * tile_size, tile_size, tile_size), 1)
+
+    # Draw the tile palette
+    for i, tile in enumerate(tile_palette):
+        pygame.draw.rect(screen, tile["color"], (i * tile_size, screen_height - tile_size, tile_size, tile_size))
+        pygame.draw.rect(screen, (0, 0, 0), (i * tile_size, screen_height - tile_size, tile_size, tile_size), 1)
 
     # Update the screen
     pygame.display.flip()
